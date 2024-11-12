@@ -1,0 +1,41 @@
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>   
+</head> 
+<body>
+    <img id="img" src="image_test/dog.png" style="height:500px;width:75%"></img>
+    <div id="output" style="font-family:courier;font-size:24px;height:300px">Hasil Klasifikasi : </br></div>
+</body>
+<script>
+    async function run(){
+        //get element id
+        const img = document.getElementById("img");
+        const outp = document.getElementById("output");
+
+        //load model
+        const MODEL_URL = 'http://127.0.0.1:8080/Week%203/model/model.json';
+        const model = await tf.loadLayersModel(MODEL_URL);
+        console.log(model.summary());
+        
+        //convert input image to tensor
+        let inputTensor = tf.browser.fromPixels(img);
+        inputTensor = tf.image.resizeBilinear(inputTensor, [150, 150]);
+        inputTensor = inputTensor.expandDims(0);
+        
+        //model result
+        const result = model.predict(inputTensor);
+        result.array().then(array => {
+            const intResult = array.flat().map(
+                value => Math.round(value)
+            );
+            if (intResult == 0) {
+                outp.innerHTML += "Ini adalah gambar Kucing";
+            }
+            else{
+                outp.innerHTML += "Ini adalah gambar Anjing";
+            }
+        });
+	}
+	run();
+</script> 
+</html>
